@@ -35,7 +35,7 @@ src/
 │   ├── theme.ts
 │   └── styles/global.css
 └── utils/               # helpers.ts
-documentation/           # Architecture and API contract (French)
+documentation/           # Working directory — agents do not read unless referenced
 ```
 
 Path aliases: `@/`, `@components/`, `@pages/`, `@stores/`, `@services/`, `@types/`, `@utils/`.
@@ -44,16 +44,16 @@ Path aliases: `@/`, `@components/`, `@pages/`, `@stores/`, `@services/`, `@types
 
 ## Implementation status (auth)
 
-The client follows the **target** contract in `documentation/infinity/stellar-gate-api.md`. The server is **not fully aligned** yet — see [../documentation/TO-BE-FIXED.md §1](../documentation/TO-BE-FIXED.md).
+The client and server are **aligned** on the cookie contract in [../contracts/auth-api.yaml](../contracts/auth-api.yaml). Verified 2026-06-13 — see [documentation/archive/auth-alignment-development-plan.md](documentation/archive/auth-alignment-development-plan.md) *(completed; user reference only)*.
 
-| Area | Client | Server today |
-|------|--------|--------------|
-| Login / register | Expects `{ user }` + cookie | Returns `{ access_token }` only; no cookie |
-| Session restore | `GET /infinity/auth/me` | Not implemented |
-| Logout | `POST /infinity/auth/logout` | Not implemented |
-| Forgot password | UI + `POST /infinity/auth/forgot-password` | Not implemented |
+| Area | Client | Server |
+|------|--------|--------|
+| Login / register | `{ user }` + cookie | `{ user }` + `infinity_token` cookie |
+| Session restore | `GET /infinity/auth/me` | Implemented (flat user body) |
+| Logout | `POST /infinity/auth/logout` | Implemented (clears cookie) |
+| Forgot password | UI + stub endpoint | Stub `{ success: true }` — no email sent yet |
 
-Do not “fix” this by storing JWT in JS or `localStorage`. Backend auth work belongs in `infinity/` per the contract doc.
+Do not store JWT in JS or `localStorage`. Server auth: [../contracts/auth-api.yaml](../contracts/auth-api.yaml).
 
 ---
 
@@ -95,6 +95,8 @@ Do not “fix” this by storing JWT in JS or `localStorage`. Backend auth work 
 
 Shared monorepo standards: [../rules/documents.md](../rules/documents.md).
 
+**Working directory:** Do not read, search, or follow links into any `documentation/` directory (monorepo root, this sub-project, or another sub-project) unless the user explicitly references a path. Links elsewhere in this file are pointers for the user — use `../contracts/` and source code for implementation context.
+
 Project docs live in `documentation/` as Markdown (`.md`). Prose is in **French**; code, paths, and API identifiers stay in **English**. Do not create docs unless explicitly requested.
 
 ---
@@ -111,15 +113,15 @@ Project docs live in `documentation/` as Markdown (`.md`). Prose is in **French*
 
 ## API contract
 
-Backend endpoints are documented in `documentation/infinity/stellar-gate-api.md` (summary in `documentation/needed-enpoint.md`):
+**Source of truth:** [../contracts/auth-api.yaml](../contracts/auth-api.yaml)
 
 | Method | Route | Auth | Server status |
 | ------ | ----- | ---- | ------------- |
-| POST | `/infinity/auth/register` | No | Partial — wrong response shape |
-| POST | `/infinity/auth/login` | No | Partial — wrong response shape |
-| POST | `/infinity/auth/logout` | Yes | Not implemented |
-| GET | `/infinity/auth/me` | Yes | Not implemented |
-| POST | `/infinity/auth/forgot-password` | No | Not implemented |
+| POST | `/infinity/auth/register` | No | Aligned (`201`, `{ user }`, cookie) |
+| POST | `/infinity/auth/login` | No | Aligned (`200`, `{ user }`, cookie) |
+| POST | `/infinity/auth/logout` | Yes | Aligned (clears cookie) |
+| GET | `/infinity/auth/me` | Yes | Aligned (flat user) |
+| POST | `/infinity/auth/forgot-password` | No | Stub only — no email delivery |
 
 When adding or changing API calls, update `authService.ts` and keep types in `src/types/auth.ts` aligned with the contract.
 
@@ -139,14 +141,18 @@ Do not commit secrets (`.env`, credentials). Do not create git commits unless ex
 
 ## Open questions
 
-Unresolved design decisions live in `documentation/to-be-defined.md` (cookie options, local dev proxy setup, Galaxy session handoff). Do not invent answers — flag gaps or follow existing patterns until documented.
+Unresolved design decisions may live in `documentation/to-be-defined.md` (user reference only). Do not read unless cited — flag gaps or follow existing patterns and `../contracts/` until the user points you there.
 
 ---
 
 ## Reference docs
 
+Index for human navigation and explicit user references — **not** for agent auto-discovery.
+
 - `documentation/stellar-gate-setup.md` — Full setup, stack, and component examples
 - `documentation/infinity/stellar-gate-api.md` — HTTP API contract (Infinity NestJS backend)
+- `documentation/archive/auth-alignment-development-plan.md` — Auth verification plan (completed, archived)
+- `../infinity/documentation/auth.md` — Server auth guide (cookie contract, session lifecycle)
 - `documentation/needed-enpoint.md` — Endpoint summary for the Stellar Gate client
 - `documentation/to-be-defined.md` — Pending decisions
 - `../documentation/TO-BE-FIXED.md` — Cross-project deferred fixes
@@ -159,5 +165,5 @@ Unresolved design decisions live in `documentation/to-be-defined.md` (cookie opt
 1. `npm run build` passes with no TypeScript errors.
 2. `npm run lint` passes (or no new lint issues in touched files).
 3. Auth flows remain cookie-based in design — no token-in-JS workarounds.
-4. New API usage matches `documentation/infinity/stellar-gate-api.md`.
+4. New API usage matches [../contracts/auth-api.yaml](../contracts/auth-api.yaml).
 5. Redirect to `/galaxy` remains a full page navigation, not a React Router link.
