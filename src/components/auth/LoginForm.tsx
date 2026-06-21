@@ -30,7 +30,7 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.username, data.password);
-      window.location.assign('/galaxy');
+      window.location.assign('/terra-view/');
     } catch {
       // Error surfaced via authStore
     }
@@ -47,9 +47,9 @@ export const LoginForm = () => {
           fullWidth
           variant="contained"
           sx={{ mb: 2 }}
-          onClick={() => window.location.assign('/galaxy')}
+          onClick={() => window.location.assign('/terra-view/')}
         >
-          Go to Galaxy
+          Enter the Galaxy
         </Button>
         <Button fullWidth variant="outlined" onClick={() => void logout()} disabled={isLoading}>
           Logout

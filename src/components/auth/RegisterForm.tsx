@@ -56,8 +56,8 @@ export const RegisterForm = () => {
         <Typography sx={{ mb: 3 }}>
           You are now logged in. Continue to Galaxy when you are ready.
         </Typography>
-        <Button fullWidth variant="contained" onClick={() => window.location.assign('/galaxy')}>
-          Go to Galaxy
+        <Button fullWidth variant="contained" onClick={() => window.location.assign('/terra-view/')}>
+          Enter the Galaxy
         </Button>
       </Box>
     );
