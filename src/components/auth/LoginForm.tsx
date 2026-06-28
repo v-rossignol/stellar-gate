@@ -39,9 +39,6 @@ export const LoginForm = () => {
   if (isAuthenticated && user) {
     return (
       <Box sx={{ mt: 1, textAlign: 'center' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          StellarGate
-        </Typography>
         <Typography sx={{ mb: 3 }}>Welcome back, {user.username}</Typography>
         <Button
           fullWidth
@@ -60,9 +57,6 @@ export const LoginForm = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        StellarGate
-      </Typography>
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
